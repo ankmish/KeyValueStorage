@@ -6,7 +6,7 @@ import java.util.Map;
 public class InMemoryKeyValueStore<K, V> implements IKeyValueStore<K, V> {
     private final Map<K, Map<String, V>> store;
     private final Map<Object, K> primaryIndex;
-    private final Map<String, Map<Object, K>> secondaryIndexes;
+    private final Map<String, Map<Object, Map<K, Map<String, V>>>> secondaryIndexes;
 
     public InMemoryKeyValueStore() {
         this.store = new HashMap<>();
@@ -29,11 +29,19 @@ public class InMemoryKeyValueStore<K, V> implements IKeyValueStore<K, V> {
             if (!attributeName.equals("primaryKey")) {
                 if (secondaryIndexes.containsKey(attributeName)) {
                     Object value = attributes.get(attributeName);
-                    secondaryIndexes.get(attributeName).put(value, key);
+
+                    // Initialize the secondary index map if not present
+                    if (!secondaryIndexes.get(attributeName).containsKey(value)) {
+                        secondaryIndexes.get(attributeName).put(value, new HashMap<>());
+                    }
+
+                    // Put the key and its attributes into the secondary index
+                    secondaryIndexes.get(attributeName).get(value).put(key, attributes);
                 }
             }
         }
     }
+
 
     @Override
     public Map<String, V> get(K key) {
@@ -89,11 +97,11 @@ public class InMemoryKeyValueStore<K, V> implements IKeyValueStore<K, V> {
             throw new IllegalArgumentException("Index not found: " + indexName);
         }
 
-        Map<K, Map<String, V>> result = new HashMap<>();
-        K key = secondaryIndexes.get(indexName).get(value);
-        if (key != null) {
-            result.put(key, store.get(key));
+        Map<K, Map<String, V>> secondaryIndex = secondaryIndexes.get(indexName).get(value);
+        if (secondaryIndex != null) {
+            return secondaryIndex;
+        } else {
+            return new HashMap<>();
         }
-        return result;
     }
 }
