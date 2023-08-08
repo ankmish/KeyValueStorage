@@ -22,7 +22,6 @@ public class KeyValueApplication {
 		attributes1.put("age", 30);
 		attributes1.put("city", "New York");
 		keyValueStore.put("1", attributes1);
-
 		Map<String, Object> attributes2 = new HashMap<>();
 		attributes2.put("primaryKey", "2");
 		attributes2.put("name", "Bob");
