@@ -32,7 +32,6 @@ public class KeyValueApplication {
 
 		// Create the primary index
 		keyValueStore.createPrimaryIndex();
-
 		// Query by primary index example
 		String key = keyValueStore.queryByPrimaryIndex("1");
 		System.out.println("Query Result (Primary Index): " + keyValueStore.get(key));
